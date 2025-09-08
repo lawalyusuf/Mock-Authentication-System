@@ -44,6 +44,7 @@ async function register({
   const otpPlain = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
   const otpHash = await notification.hashOTP(otpPlain);
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+  channel = channel || "whatsapp"; //default to Whatapp
 
   await OTP.create({
     userId: user.id,

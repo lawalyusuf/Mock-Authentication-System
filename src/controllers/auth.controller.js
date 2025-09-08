@@ -9,21 +9,50 @@ const {
 const challengeService = require("../services/challenge.service");
 const User = require("../models/User");
 
+// async function register(req, res) {
+//   // Validation is done via express-validator
+//   try {
+//     const { username, dob, referralCode, passcode, channel, destination } =
+//       req.body;
+//     const ip = req.ip;
+//     const user = await authService.register({
+//       username,
+//       dob,
+//       referralCode,
+//       passcode,
+//       channel,
+//       destination,
+//       ip,
+//     });
+//     return res.status(201).json({
+//       message: "Registered. OTP sent",
+//       user: { id: user.id, username: user.username },
+//     });
+//   } catch (err) {
+//     logger.error({ action: "register_error", error: err.message });
+//     return res.status(400).json({ message: err.message });
+//   }
+// }
 async function register(req, res) {
-  // Validation is done via express-validator
   try {
     const { username, dob, referralCode, passcode, channel, destination } =
       req.body;
+
+    // Defaults if not provided
+    const sendChannel = channel || "whatsapp";
+    const sendDestination = destination || "whatsapp:+2340000000000";
+
     const ip = req.ip;
     const user = await authService.register({
       username,
       dob,
       referralCode,
       passcode,
-      channel,
-      destination,
+      channel: sendChannel,
+      destination: sendDestination,
       ip,
     });
+
     return res.status(201).json({
       message: "Registered. OTP sent",
       user: { id: user.id, username: user.username },
@@ -33,7 +62,6 @@ async function register(req, res) {
     return res.status(400).json({ message: err.message });
   }
 }
-
 async function login(req, res) {
   // Capture and validate
   const errors = validationResult(req);
@@ -79,16 +107,27 @@ async function login(req, res) {
   }
 }
 
+// async function requestOTP(req, res) {
+//   const { userId, channel, destination } = req.body;
+//   try {
+//     await authService.requestOTP(userId, channel, destination);
+//     res.json({ message: "OTP issued" });
+//   } catch (err) {
+//     res.status(400).json({ message: err.message });
+//   }
+// }
 async function requestOTP(req, res) {
   const { userId, channel, destination } = req.body;
   try {
-    await authService.requestOTP(userId, channel, destination);
+    const sendChannel = channel || "whatsapp";
+    const sendDestination = destination || "whatsapp:+2340000000000";
+
+    await authService.requestOTP(userId, sendChannel, sendDestination);
     res.json({ message: "OTP issued" });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
-
 async function validateOTP(req, res) {
   const { userId, otp } = req.body;
   try {

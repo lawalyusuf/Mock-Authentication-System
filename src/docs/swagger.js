@@ -1,22 +1,27 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+// src/docs/swagger.js
 const swaggerUi = require("swagger-ui-express");
-
-const options = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Stanbic Authentication System (SAS) API",
-      version: "1.0.0",
-      description: "Auth API: register, login, MFA, RBAC",
-    },
-  },
-  apis: ["./src/routes/*.js"],
-};
-
-const spec = swaggerJsdoc(options);
+const swaggerJsdoc = require("swagger-jsdoc");
 
 function setupSwagger(app) {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(spec));
+  const options = {
+    definition: {
+      openapi: "3.0.0",
+      info: {
+        title: "Stanbic Authentication System API",
+        version: "1.0.0",
+        description: "API documentation for SAS endpoints",
+      },
+      servers: [
+        {
+          url: "http://localhost:3000", // adjust if different
+        },
+      ],
+    },
+    apis: ["./src/routes/*.js"], // will read JSDoc comments in your routes
+  };
+
+  const swaggerSpec = swaggerJsdoc(options);
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
 
 module.exports = setupSwagger;
